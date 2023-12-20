@@ -5,17 +5,35 @@
  */
 package bg.smg.bankapp_nb.frames;
 
+import bg.smg.bankapp_nb.model.User;
+import bg.smg.bankapp_nb.services.UserService;
+import bg.smg.bankapp_nb.services.UserServiceI;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author n.m.borisova
  */
 public class LoginForm extends javax.swing.JFrame {
 
+    UserServiceI userService;
     /**
      * Creates new form LoginForm
      */
     public LoginForm() {
         initComponents();
+        try {
+            userService = new UserService();
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Грешка при извличане на потребител от базата данни.",
+                    "Грешка!",
+                    JOptionPane.WARNING_MESSAGE);
+            Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -131,9 +149,30 @@ public class LoginForm extends javax.swing.JFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
         //code for DB save of user
-        this.setVisible(false);
-        MainFrame mf = new MainFrame();
-        mf.setVisible(true);
+         try {
+            String username = jTextField1.getText();
+            String password = jPasswordField1.getPassword().toString();
+       
+            User user = userService.getUserByUsername(username);
+        
+            boolean loginSuccessful = user != null;
+            if(loginSuccessful){
+                this.setVisible(false);
+                MainFrame mf = new MainFrame();
+                mf.setVisible(true);
+            } else {
+                    JOptionPane.showMessageDialog(this,
+                    "Моля въведете правилните потребител и парола!",
+                    "Грешен вход",
+                    JOptionPane.WARNING_MESSAGE);
+            }
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Грешка при извличане на потребител от базата данни.",
+                    "Грешка!",
+                    JOptionPane.WARNING_MESSAGE);
+            Logger.getLogger(LoginForm.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
